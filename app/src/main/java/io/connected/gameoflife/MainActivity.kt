@@ -21,25 +21,23 @@ class MainActivity : AppCompatActivity() {
         const val COLS = 27
     }
 
-    private val game = GameOfLife(ROWS, COLS).apply {
-        for (i in 0 until ROWS) {
-            for (j in 0 until COLS) {
-                board[i][j] = if (Math.random() < 0.5) 0 else 1
-            }
-        }
-    }
     private val views = Array(ROWS) { Array(COLS) { null as View? } }
-
+    private val stepRunnable = StepRunnable()
     private val handler = Handler()
+
+    private var game = newGame()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        populateLayout()
+
         fab.setOnClickListener {
-            populateLayout()
+            game = newGame()
+            update()
             handler.removeCallbacks(null)
-            handler.post(StepRunnable())
+            handler.post(stepRunnable)
         }
     }
 
@@ -82,11 +80,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun newGame() = GameOfLife(ROWS, COLS).apply {
+        for (i in 0 until ROWS) {
+            for (j in 0 until COLS) {
+                board[i][j] = if (Math.random() < 0.5) 0 else 1
+            }
+        }
+    }
+
     private inner class StepRunnable : Runnable {
         override fun run() {
             game.step()
             update()
-            handler.postDelayed(StepRunnable(), 100)
+            handler.postDelayed(this, 100)
         }
 
     }

@@ -35,11 +35,24 @@ class GameOfLifeTest {
     }
 
     @Test
-    fun `countNeighbours - has one neighbour - returns 1 `(){
+    fun `countNeighbours - has one neighbour - returns 1`(){
         sut.board[0][1] = ALIVE
         val count = sut.countNeighbours(0,0)
 
         assertEquals(1, count)
+    }
+
+    @Test
+    fun `countNeighbours - has four neighbours - returns 4`(){
+        sut.board[0][0] = ALIVE
+        sut.board[0][1] = ALIVE
+        sut.board[0][2] = ALIVE
+        sut.board[1][0] = ALIVE
+
+        sut.board[1][1] = ALIVE // Tested
+        val count = sut.countNeighbours(1,1)
+
+        assertEquals(4, count)
     }
 
     @Test
@@ -71,4 +84,41 @@ class GameOfLifeTest {
         assertFalse(sut.isCellAlive(1,1))
     }
 
+    @Test
+    fun `step - dead cell has exactly 3 neighbors - is born`(){
+        // Neighbors
+        sut.board[0][0] = ALIVE
+        sut.board[0][1] = ALIVE
+        sut.board[0][2] = ALIVE
+
+        sut.board[1][1] = DEAD
+
+        sut.step()
+        assertTrue(sut.isCellAlive(1,1))
+    }
+
+    @Test
+    fun `step - live cell has exactly 2 neighbors - stays alive`() {
+        // Neighbors
+        sut.board[0][0] = ALIVE
+        sut.board[0][1] = ALIVE
+
+        sut.board[1][1] = ALIVE
+
+        sut.step()
+        assertTrue(sut.isCellAlive(1,1))
+    }
+
+    @Test
+    fun `step - alive cell has exactly 3 neighbors - stays alive`(){
+        // Neighbors
+        sut.board[0][0] = ALIVE
+        sut.board[0][1] = ALIVE
+        sut.board[0][2] = ALIVE
+
+        sut.board[1][1] = ALIVE
+
+        sut.step()
+        assertTrue(sut.isCellAlive(1,1))
+    }
 }

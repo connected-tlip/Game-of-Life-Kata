@@ -1,6 +1,7 @@
 package io.connected.gameoflife
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -10,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import java.util.Timer
+import java.util.TimerTask
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,17 +30,17 @@ class MainActivity : AppCompatActivity() {
     }
     private val views = Array(ROWS) { Array(COLS) { null as View? } }
 
+    private val handler = Handler()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         fab.setOnClickListener {
-            game.step()
-            update()
+            populateLayout()
+            handler.removeCallbacks(null)
+            handler.post(StepRunnable())
         }
-
-        populateLayout()
-        update()
     }
 
     fun populateLayout() {
@@ -77,6 +80,15 @@ class MainActivity : AppCompatActivity() {
                 views[i][j]?.setBackgroundColor(resources.getColor(color))
             }
         }
+    }
+
+    private inner class StepRunnable : Runnable {
+        override fun run() {
+            game.step()
+            update()
+            handler.postDelayed(StepRunnable(), 100)
+        }
+
     }
 
 }
